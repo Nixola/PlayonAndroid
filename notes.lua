@@ -34,7 +34,6 @@ functions.saw = function(s, v, a) local n = 2*(s*v/RATE-math.floor(1/2+s*v/RATE)
 --functions.triang = function(s, v, a) return 2*math.abs(functions.saw(s,v,a))-1 end
 --functions.string = function(s,v,a) return (functions.triang(s, v*2, a)+functions.triang(s,v,a)+functions.saw(s,v,a))*a/3 end
 functions.organ = function(s, v, a) return functions.sine(s, v/2, a/5)+functions.sine(s, v, a/5)+functions.sine(s, v*2, a/5)+functions.sine(s, v*4, a/5)+functions.sine(s, v*8, a/5) end
---functions.theremin = function(s, v, a) return functions.sine(s, 48000, a)-functions.sine(s, 48000-v, a) end
 functions.sinebeat = function(s, v, a) 
 	local attack = math.floor(0.002 * RATE);
 	local decay = attack + math.floor(0.2 * RATE);
@@ -57,6 +56,22 @@ functions.organbeat = function(s,v,a)
 	end
 	return functions.organ(s,v,a)
 end
+functions.guitarbeat --[[continuous guitar?]] = function(s, v, a, t)
+	local N = math.floor(RATE / v)
+	if not t then
+		t = {}
+		for i = 1, N do
+			t[i] = love.math.random()-0.5
+		end
+	end
+	if s+1 <= N then
+		return t[s+1], t
+	end
+	t[N+1] = (t[1]+t[2])*.498
+	table.remove(t, 1)
+	return t[1], t
+end
+	
 	
 if not functions[args[1]] then
 
@@ -81,13 +96,15 @@ for i = noteMin, noteMax do
 	local v = notes[i]
 	local T = RATE/v
 	local samples = math.floor(RATE/T)*T--*.202
+	local t
 	--local samples = RATE
 
 	--local samples = T*15
 	--print(samples)
 	notes.soundDatas[i] = love.sound.newSoundData( samples, RATE, 16, 1)
 	for s = 0, samples-1 do
-		local sample = functions[args[1]](s, v, a)
+		local sample
+		sample, t = functions[args[1]](s, v, a, t)
 		notes.soundDatas[i]:setSample(s, sample)
 	end
 end

@@ -28,7 +28,7 @@ instr = {
 		[true] = notes("organbeat", 1/3, 28, 68),
 		[false] = notes("organ", 1/3, 28, 68)},
 	[true] = {
-		[true] = notes("sinebeat", 1/3, 28, 68),
+		[true] = notes("guitarbeat", 1/3, 28, 68),
 		[false] = notes("sine", 1/3, 28, 68)}
 }
 sine = false
